@@ -14,6 +14,7 @@
   "rules": {
     // 不写分号
     "semi": [0],
-    "react/jsx-filename-extension": [0]
+    "react/jsx-filename-extension": [0],
+    "linebreak-style": [0]
   }
 }

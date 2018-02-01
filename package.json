@@ -7,7 +7,7 @@
     "build:client": "webpack --config build/webpack.config.client.js",
     "build:server": "webpack --config build/webpack.config.server.js",
     "dev:client": "cross-env NODE_ENV=development webpack-dev-server --config build/webpack.config.client.js",
-    "dev:server": "cross-env NODE_ENV=development node server/server.js",
+    "dev:server": "nodemon server/server.js",
     "build": "npm run clear && npm run build:client && npm run build:server",
     "clear": "rimraf dist"
   },
@@ -21,6 +21,9 @@
     "react": "^16.2.0",
     "react-dom": "^16.0.0",
     "react-hot-loader": "^4.0.0-beta.18",
+    "react-router": "^4.2.0",
+    "react-router-dom": "^4.2.2",
+    "serve-favicon": "^2.4.5",
     "webpack": "^3.10.0"
   },
   "devDependencies": {
@@ -42,7 +45,9 @@
     "html-webpack-plugin": "^2.30.1",
     "http-proxy-middleware": "^0.17.4",
     "memory-fs": "^0.4.1",
+    "nodemon": "^1.14.11",
     "rimraf": "^2.6.2",
-    "webpack-dev-server": "^2.11.1"
+    "webpack-dev-server": "^2.11.1",
+    "webpack-merge": "^4.1.1"
   }
 }
