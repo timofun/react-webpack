@@ -4,7 +4,7 @@ import {
   observer,
 } from 'mobx-react'
 import PropTypes from 'prop-types'
-import { AppState } from '../../store/app-state'
+import appState from '../../store/app-state'
 
 @inject('appState') @observer
 export default class TopicList extends React.Component {
@@ -19,7 +19,7 @@ export default class TopicList extends React.Component {
   }
 
   changeName(event) {
-    this.props.appState.name = event.target.value
+    this.props.appState.changeName(event.target.value)
   }
 
   render() {
@@ -32,5 +32,5 @@ export default class TopicList extends React.Component {
 }
 
 TopicList.propTypes = {
-  appState: PropTypes.instanceOf(AppState).isRequired,
+  appState: PropTypes.instanceOf(appState).isRequired,
 }
