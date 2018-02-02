@@ -3,13 +3,13 @@ const path = require('path')
 const webpack = require('webpack')
 const MemoryFs = require('memory-fs')
 const proxy = require('http-proxy-middleware')
-const ReactDomServer = require('react-dom/server')
 
+const serverRender = require('./server-render')
 const serverConfig = require('../../build/webpack.config.server')
 
 const getTemplate = () => {
   return new Promise((resolve, reject) => {
-    axios.get('http://localhost:8888/public/index.html')
+    axios.get('http://localhost:8888/public/server.ejs')
       .then(res => {
         resolve(res.data)
       })
@@ -17,7 +17,22 @@ const getTemplate = () => {
   })
 }
 
+const nativeModule = require('module')
+const vm = require('vm')
+
 const Module = module.constructor
+
+const getModuleFromString = (bundle, filename) => {
+  const m = { exports: {} }
+  const wrapper = nativeModule.wrap(bundle)
+  const script = new vm.Script(wrapper, {
+    filename: filename,
+    displayErrors: true,
+  })
+  const result = script.runInThisContext()
+  result.call(m.exports, m.exportsm, require, m)
+  return m
+}
 
 const mfs = new MemoryFs
 const serverCompiler = webpack(serverConfig)
@@ -36,9 +51,8 @@ serverCompiler.watch({}, (err, stats) => {
 
   const bundle = mfs.readFileSync(bundlePath, 'utf8')
   // 字符串转模版 hack
-  const m = new Module()
-  m._compile(bundle, 'server-entry.js')
-  serverBundle = m.exports.default
+  const m = getModuleFromString(bundle, 'server-entry.js')
+  serverBundle = m.exports
 })
 
 module.exports = function (app) {
@@ -46,11 +60,9 @@ module.exports = function (app) {
     target: 'http://localhost:8888'
   }))
 
-  app.get('*', function (req, res) {
+  app.get('*', function (req, res, next) {
     getTemplate().then(template => {
-      const content = ReactDomServer.renderToString(serverBundle)
-      res.send(template.replace('<!-- app -->', content))
-    })
+      return serverRender(serverBundle, template, req, res)
+    }).catch(next)
   })
-
 }

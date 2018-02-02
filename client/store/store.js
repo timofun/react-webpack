@@ -1,4 +1,13 @@
-/**
- * Created by Administrator on 2018/2/1.
- * function : xxxxx
- */
+import AppStateClass from './app-state'
+
+export const AppState = AppStateClass
+
+export default {
+  AppState,
+}
+
+export const createStoreMap = () => {
+  return {
+    appState: new AppState(),
+  }
+}
