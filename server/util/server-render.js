@@ -4,6 +4,11 @@ const asyncBootstrap = require('react-async-bootstrapper').default
 const ReactDomServer = require('react-dom/server')
 const Helmet = require('react-helmet').default
 
+const SheetsRegistry = require('react-jss/lib/jss').SheetsRegistry
+const createMuiTheme = require('material-ui/styles').createMuiTheme
+const createGenerateClassName = require('material-ui/styles').createGenerateClassName
+const colors = require('material-ui/colors')
+
 const getStoreState = (stores) => {
   return Object.keys(stores).reduce((result, storeName) => {
     result[storeName] = stores[storeName].toJson()
@@ -18,7 +23,17 @@ module.exports = (bundle, template, req, res) => {
 
     const routerContext = {}
     const stores = createStoreMap()
-    const app = createApp(stores, routerContext, req.url)
+    const sheetsRegistry = new SheetsRegistry()
+    const generateClassName = createGenerateClassName()
+    const theme = createMuiTheme({
+      palette: {
+        primary: colors.pink,
+        accent: colors.lightBlue,
+        type: 'light',
+      },
+    });
+
+    const app = createApp(stores, routerContext, sheetsRegistry, generateClassName, theme, req.url)
 
     asyncBootstrap(app).then(() => {
 
@@ -38,6 +53,7 @@ module.exports = (bundle, template, req, res) => {
         title: helmet.title.toString(),
         style: helmet.style.toString(),
         link: helmet.link.toString(),
+        materialCss: sheetsRegistry.toString(),
       })
       res.send(html)
       resolve()
